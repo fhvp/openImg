@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F9C84004-7906-4A58-A2C6-65FEFA0095C3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MOBPlatform</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)$(Configuration)\bin\log</IntDir>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetExt>.lib</TargetExt>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(SolutionDir)$(Configuration)\bin\log\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\bin\log</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_MBCS;WIN32;_DEBUG;_WINDOWS;_USRDLL;MOBPLATFORM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\bin\src\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\bin\src\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformationFile>$(SolutionDir)$(Configuration)\bin\src\</BrowseInformationFile>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\bin\src\</AssemblerListingLocation>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\bin\src\</ObjectFileName>
+      <XMLDocumentationFileName>$(SolutionDir)$(Configuration)\bin\src\</XMLDocumentationFileName>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName)$(TargetExt)</OutputFile>
+      <ManifestFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName)$(TargetExt).intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).pgd</ProfileGuidedDatabase>
+      <ImportLibrary>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).lib</ImportLibrary>
+    </Link>
+    <BuildLog>
+      <Path>$(SolutionDir)$(Configuration)\bin\log$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <Lib>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_MBCS;WIN32;_DEBUG;_WINDOWS;_USRDLL;MOBPLATFORM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\bin\src\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\bin\src\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <BrowseInformationFile>$(SolutionDir)$(Configuration)\bin\src\</BrowseInformationFile>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\bin\src\</AssemblerListingLocation>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\bin\src\</ObjectFileName>
+      <XMLDocumentationFileName>$(SolutionDir)$(Configuration)\bin\src\</XMLDocumentationFileName>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName)$(TargetExt)</OutputFile>
+      <ManifestFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName)$(TargetExt).intermediate.manifest</ManifestFile>
+      <ProgramDatabaseFile>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).pgd</ProfileGuidedDatabase>
+      <ImportLibrary>$(SolutionDir)$(Configuration)\bin\lib$(TargetName).lib</ImportLibrary>
+    </Link>
+    <BuildLog>
+      <Path>$(SolutionDir)$(Configuration)\bin\log$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <Lib>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MOBPLATFORM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\bin\src\</AssemblerListingLocation>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\bin\src\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\bin\src\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>$(SolutionDir)$(Configuration)\bin\src\</XMLDocumentationFileName>
+      <BrowseInformationFile>$(SolutionDir)$(Configuration)\bin\src\</BrowseInformationFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <BuildLog>
+      <Path>$(SolutionDir)$(Configuration)\bin\log\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <Lib>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MOBPLATFORM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\bin\src\</AssemblerListingLocation>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\bin\src\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\bin\src\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <XMLDocumentationFileName>$(SolutionDir)$(Configuration)\bin\src\</XMLDocumentationFileName>
+      <BrowseInformationFile>$(SolutionDir)$(Configuration)\bin\src\</BrowseInformationFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <BuildLog>
+      <Path>$(SolutionDir)$(Configuration)\bin\log\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <Lib>
+      <OutputFile>$(SolutionDir)$(Configuration)\bin\lib\$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="MOBCommon.h" />
+    <ClInclude Include="MOBConsole.h" />
+    <ClInclude Include="MOBClass.h" />
+    <ClInclude Include="MOBDefs.h" />
+    <ClInclude Include="MOBFile.h" />
+    <ClInclude Include="MOBLayer.h" />
+    <ClInclude Include="MOBList.h" />
+    <ClInclude Include="MOBLogger.h" />
+    <ClInclude Include="MOBMessageBlock.h" />
+    <ClInclude Include="MOBMessageQueue.h" />
+    <ClInclude Include="MOBPath.h" />
+    <ClInclude Include="MOBPlatform.h" />
+    <ClInclude Include="MOBSocket.h" />
+    <ClInclude Include="MOBThread.h" />
+    <ClInclude Include="MOBTime.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MOBConsole.cpp" />
+    <ClCompile Include="MOBClass.cpp" />
+    <ClCompile Include="MOBFile.cpp" />
+    <ClCompile Include="MOBList.cpp" />
+    <ClCompile Include="MOBLogger.cpp" />
+    <ClCompile Include="MOBMessageBlock.cpp" />
+    <ClCompile Include="MOBMessageQueue.cpp" />
+    <ClCompile Include="MOBPath.cpp" />
+    <ClCompile Include="MOBPlatform.cpp" />
+    <ClCompile Include="MOBSocket.cpp" />
+    <ClCompile Include="MOBThread.cpp" />
+    <ClCompile Include="MOBTime.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
