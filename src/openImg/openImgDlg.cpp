@@ -18,6 +18,9 @@
 
 #include "IplImageDB.h"
 
+//Chiled Dlg
+#include "ResizeDlg.h"
+
 using namespace cv;
 #endif /*OPENCV*/
 
@@ -103,6 +106,7 @@ BEGIN_MESSAGE_MAP(CopenImgDlg, CDialogEx)
 	//ON_WM_KEYDOWN()
 	ON_WM_LBUTTONDOWN()
 	ON_BN_CLICKED(IDC_CLOSE, &CopenImgDlg::OnBnClickedClose)
+	ON_BN_CLICKED(IDC_RESIZE, &CopenImgDlg::OnBnClickedResize)
 END_MESSAGE_MAP()
 
 
@@ -239,10 +243,22 @@ void CopenImgDlg::ShowImage(const T _name, int flag/* = OUTPUT_MESSAGE*/)
 		switch (flag)
 		{
 		case 0:
-			imshow(_name, pIplImage->m_outMat);
+			if (pIplImage->m_resize != 0.0)
+			{
+				resize(pIplImage->m_outMat, pIplImage->m_resizeMat, Size(pIplImage->m_outMat.cols / pIplImage->m_resize, pIplImage->m_outMat.rows / pIplImage->m_resize), 0, 0, CV_INTER_NN);
+				imshow(_name, pIplImage->m_resizeMat);
+			}
+			else
+				imshow(_name, pIplImage->m_outMat);
 			break;
 		default:
-			imshow(_name, pIplImage->m_inMat);
+			if (pIplImage->m_resize != 0.0)
+			{
+				resize(pIplImage->m_inMat, pIplImage->m_resizeMat, Size(pIplImage->m_inMat.cols / pIplImage->m_resize, pIplImage->m_inMat.rows / pIplImage->m_resize), 0, 0, CV_INTER_NN);
+				imshow(_name, pIplImage->m_resizeMat);
+			}
+			else
+				imshow(_name, pIplImage->m_inMat);
 			break;
 		}
 		waitKey(10);
@@ -364,6 +380,9 @@ STATE CopenImgDlg::OpenImage(char* _filePath)
 		//copy outMat
 		pIplImage->m_outMat = pIplImage->m_inMat.clone();
 		pIplImage->m_midMat = pIplImage->m_inMat.clone();	//Auto Control
+
+		//Set Resize
+		pIplImage->SetResize(pIplImage->m_inMat.cols, pIplImage->m_inMat.rows);
 
 		//Save Image DB
 		this->m_iplImage = pIplImage;
@@ -533,6 +552,32 @@ void CopenImgDlg::OnBnClickedSaturationUp()
 	}
 }
 
+void CopenImgDlg::OnBnClickedResize()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+
+	if (pIplImage != NULL)
+	{
+		CResizeDlg resizeDlg;
+
+		resizeDlg.m_cols = pIplImage->m_midMat.cols;
+		resizeDlg.m_rows = pIplImage->m_midMat.rows;
+
+		resizeDlg.DoModal();
+		//resizeDlg->Create(IDD_RESIZE, this);
+		//resizeDlg->ShowWindow(SW_SHOW);
+
+		resizeDlg.m_cols;
+
+		resize(pIplImage->m_outMat, pIplImage->m_outMat, Size(resizeDlg.m_cols, resizeDlg.m_rows), 0, 0, CV_INTER_CUBIC);
+		resize(pIplImage->m_midMat, pIplImage->m_midMat, Size(resizeDlg.m_cols, resizeDlg.m_rows), 0, 0, CV_INTER_CUBIC);
+		pIplImage->SetResize(pIplImage->m_midMat.cols, pIplImage->m_midMat.rows);
+
+		ShowImage(pIplImage->m_name);
+	}
+}
+
 void CopenImgDlg::OnBnClickedInit()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -543,6 +588,8 @@ void CopenImgDlg::OnBnClickedInit()
 		pIplImage->m_outMat = pIplImage->m_inMat.clone();
 		pIplImage->m_midMat = pIplImage->m_inMat.clone();
 		pIplImage->Clear();
+
+		pIplImage->SetResize(pIplImage->m_inMat.cols, pIplImage->m_inMat.rows);
 
 		ShowImage(pIplImage->m_name);
 	}
@@ -599,7 +646,6 @@ void CopenImgDlg::OnBnClickedSave()
 	}
 }
 
-
 void CopenImgDlg::OnBnClickedClose()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -626,4 +672,3 @@ void CopenImgDlg::OnBnClickedClose()
 
 	::SendMessage(this->GetSafeHwnd(), WM_CLOSE, NULL, NULL);
 }
-

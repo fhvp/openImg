@@ -66,10 +66,11 @@ public:
 	afx_msg void OnBnClickedBrightUp();
 	afx_msg void OnBnClickedContrestDown();
 	afx_msg void OnBnClickedContrestUp();
-	afx_msg void OnBnClickedInit();
 	afx_msg void OnBnClickedOriginalImg();
-	afx_msg void OnBnClickedSave();
 	afx_msg void OnBnClickedSaturationDown();
 	afx_msg void OnBnClickedSaturationUp();
+	afx_msg void OnBnClickedInit();
+	afx_msg void OnBnClickedResize();
+	afx_msg void OnBnClickedSave();
 	afx_msg void OnBnClickedClose();
 };

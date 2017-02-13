@@ -41,10 +41,15 @@ public:
 	//file name & path
 	String				m_path;
 	String				m_name;
+
+	//resize
+	double				m_resize;
+	Mat					m_resizeMat;
 public:
 	CIplImageDB();
 	virtual ~CIplImageDB();
 
+	void SetResize(int _width, int _height);
 	void Clear();
 	void Delete();
 
