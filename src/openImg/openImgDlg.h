@@ -6,6 +6,7 @@
 
 #include "MOBCommon.h"
 #include <string.h>
+#include "afxwin.h"
 
 
 #define INPUT_IMAGE			"원본영상"
@@ -14,6 +15,12 @@ enum MessageFlag
 {
 	OUTPUT_MESSAGE,
 	INPUT_MESSAGE
+};
+
+enum FilterSplitFlag
+{
+	FILTER_SPLIT_GAUSSIAN_NORMAL,
+	FILTER_SPLIT_GAUSSIAN_LARGE
 };
 
 class CIplImageDB;
@@ -33,9 +40,6 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
-protected:
-	void* m_iplImage;	//CIplImageDB for IplImageDB.h
-
 
 protected:
 	template <typename T>
@@ -46,10 +50,14 @@ protected:
 	STATE OpenImage(char* _filePath);
 	void ConvertImage(CIplImageDB* _pIplImage);
 
+
 // 구현입니다.
 protected:
-	HICON m_hIcon;
-	CButton m_cbOriginalImg;
+	void*						m_iplImage;	//CIplImageDB for IplImageDB.h
+	HICON						m_hIcon;
+	CButton						m_cbOriginalImg;
+	CSplitButton				m_filterSplit;
+	UCHAR						m_filterSplitItem;
 
 	// 생성된 메시지 맵 함수
 	DECLARE_MESSAGE_MAP()
@@ -69,6 +77,9 @@ public:
 	afx_msg void OnBnClickedOriginalImg();
 	afx_msg void OnBnClickedSaturationDown();
 	afx_msg void OnBnClickedSaturationUp();
+	afx_msg void OnBnClickedFilterSplit();
+	afx_msg void OnBnClickedGaussianFilterNormal();
+	afx_msg void OnBnClickedGaussianFilterLarge();
 	afx_msg void OnBnClickedInit();
 	afx_msg void OnBnClickedResize();
 	afx_msg void OnBnClickedSave();
