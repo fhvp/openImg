@@ -86,7 +86,8 @@ void CopenImgDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_ORIGINAL_IMG, m_cbOriginalImg);
-	DDX_Control(pDX, IDC_FILTER_SPLIT, m_filterSplit);
+	DDX_Control(pDX, IDC_BLEAR_FILTER_SPLIT, m_blearFilterSplit);
+	DDX_Control(pDX, IDC_UNSHARP_FILTER_SPLIT, m_unsharpFilterSplit);
 }
 
 BEGIN_MESSAGE_MAP(CopenImgDlg, CDialogEx)
@@ -108,9 +109,12 @@ BEGIN_MESSAGE_MAP(CopenImgDlg, CDialogEx)
 	ON_WM_LBUTTONDOWN()
 	ON_BN_CLICKED(IDC_CLOSE, &CopenImgDlg::OnBnClickedClose)
 	ON_BN_CLICKED(IDC_RESIZE, &CopenImgDlg::OnBnClickedResize)
-	ON_BN_CLICKED(IDC_FILTER_SPLIT, &CopenImgDlg::OnBnClickedFilterSplit)
-	ON_COMMAND(ID_GAUSSIAN_FILTER_NOMAL, &CopenImgDlg::OnBnClickedGaussianFilterNormal)
+	ON_BN_CLICKED(IDC_BLEAR_FILTER_SPLIT, &CopenImgDlg::OnBnClickedFilterSplit)
+	ON_COMMAND(ID_GAUSSIAN_FILTER_NORMAL, &CopenImgDlg::OnBnClickedGaussianFilterNormal)
 	ON_COMMAND(ID_GAUSSIAN_FILTER_LARGE, &CopenImgDlg::OnBnClickedGaussianFilterLarge)
+	ON_BN_CLICKED(IDC_UNSHARP_FILTER_SPLIT, &CopenImgDlg::OnBnClickedUnsharpFilterSplit)
+	ON_COMMAND(ID_UNSHARP_FILTER_NORMAL, &CopenImgDlg::OnBnClickedUnsharpFilterNormal)
+	ON_COMMAND(ID_UNSHARP_FILTER_LARGE, &CopenImgDlg::OnBnClickedUnsharpFilterLarge)
 END_MESSAGE_MAP()
 
 
@@ -147,9 +151,13 @@ BOOL CopenImgDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	//Initialize
-	this->m_filterSplit.SetDropDownMenu(IDR_FILTER_MENU, 0);
+	this->m_blearFilterSplit.SetDropDownMenu(IDR_FILTER_BLEAR_MENU, 0);
 
-	this->m_filterSplitItem = FILTER_SPLIT_GAUSSIAN_NORMAL;
+	this->m_blearFilterSplitItem = FILTER_SPLIT_GAUSSIAN_NORMAL;
+
+	this->m_unsharpFilterSplit.SetDropDownMenu(IDR_FILTER_SHARP_MENU, 0);
+
+	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_NORMAL;
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -565,7 +573,7 @@ void CopenImgDlg::OnBnClickedFilterSplit()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 
-	switch (this->m_filterSplitItem)
+	switch (this->m_blearFilterSplitItem)
 	{
 	case FILTER_SPLIT_GAUSSIAN_NORMAL:
 		this->OnBnClickedGaussianFilterNormal();
@@ -583,15 +591,13 @@ void CopenImgDlg::OnBnClickedGaussianFilterNormal()
 
 	if (pIplImage != NULL)
 	{
-		this->m_filterSplit.SetWindowTextW(L"흐리게");
-		this->m_filterSplitItem = FILTER_SPLIT_GAUSSIAN_NORMAL;
-		//AfxMessageBox(L"OnBnClickedGaussianFilterNormal");
-		
 		GaussianBlur(pIplImage->m_midMat, pIplImage->m_midMat, Size(3, 3), CV_INTER_AREA);
 		ConvertImage(pIplImage);
 
 		ShowImage(pIplImage->m_name);
 	}
+	this->m_blearFilterSplit.SetWindowTextW(L"흐리게");
+	this->m_blearFilterSplitItem = FILTER_SPLIT_GAUSSIAN_NORMAL;
 }
 
 void CopenImgDlg::OnBnClickedGaussianFilterLarge()
@@ -601,15 +607,65 @@ void CopenImgDlg::OnBnClickedGaussianFilterLarge()
 
 	if (pIplImage != NULL)
 	{
-		this->m_filterSplit.SetWindowTextW(L"더흐리게");
-		this->m_filterSplitItem = FILTER_SPLIT_GAUSSIAN_LARGE;
-		//AfxMessageBox(L"OnBnClickedGaussianFilterLarge");
-
 		GaussianBlur(pIplImage->m_midMat, pIplImage->m_midMat, Size(5, 5), CV_INTER_AREA);
 
 		ConvertImage(pIplImage);
 		ShowImage(pIplImage->m_name);
 	}
+	this->m_blearFilterSplit.SetWindowTextW(L"더흐리게");
+	this->m_blearFilterSplitItem = FILTER_SPLIT_GAUSSIAN_LARGE;
+}
+
+void CopenImgDlg::OnBnClickedUnsharpFilterSplit()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	switch (this->m_unsharpFilterSplitItem)
+	{
+	case FILTER_SPLIT_UNSHARP_NORMAL:
+		this->OnBnClickedUnsharpFilterNormal();
+		break;
+	case FILTER_SPLIT_UNSHARP_LARGE:
+		this->OnBnClickedUnsharpFilterLarge();
+		break;
+	}
+}
+
+void CopenImgDlg::OnBnClickedUnsharpFilterNormal()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+
+	if (pIplImage != NULL)
+	{
+		Mat kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+
+		filter2D(pIplImage->m_midMat, pIplImage->m_midMat, pIplImage->m_midMat.depth(), kernel);
+
+		ConvertImage(pIplImage);
+		ShowImage(pIplImage->m_name);
+	}
+
+	this->m_unsharpFilterSplit.SetWindowTextW(L"선명하게");
+	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_NORMAL;
+}
+
+void CopenImgDlg::OnBnClickedUnsharpFilterLarge()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+
+	if (pIplImage != NULL)
+	{
+		Mat kernel = (Mat_<char>(3, 3) << -1, -1, -1, -1, 9, -1, -1, -1, -1);
+
+		filter2D(pIplImage->m_midMat, pIplImage->m_midMat, pIplImage->m_midMat.depth(), kernel);
+
+		ConvertImage(pIplImage);
+		ShowImage(pIplImage->m_name);
+	}
+	this->m_unsharpFilterSplit.SetWindowTextW(L"더선명하게");
+	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_LARGE;
 }
 
 void CopenImgDlg::OnBnClickedResize()
@@ -733,3 +789,4 @@ void CopenImgDlg::OnBnClickedClose()
 	//Close
 	::SendMessage(this->GetSafeHwnd(), WM_CLOSE, NULL, NULL);
 }
+

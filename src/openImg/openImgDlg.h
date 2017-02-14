@@ -17,10 +17,16 @@ enum MessageFlag
 	INPUT_MESSAGE
 };
 
-enum FilterSplitFlag
+enum BlearFilterSplitFlag
 {
 	FILTER_SPLIT_GAUSSIAN_NORMAL,
-	FILTER_SPLIT_GAUSSIAN_LARGE
+	FILTER_SPLIT_GAUSSIAN_LARGE,
+};
+
+enum UnsharpFilterSplitFlag
+{
+	FILTER_SPLIT_UNSHARP_NORMAL,
+	FILTER_SPLIT_UNSHARP_LARGE
 };
 
 class CIplImageDB;
@@ -56,8 +62,10 @@ protected:
 	void*						m_iplImage;	//CIplImageDB for IplImageDB.h
 	HICON						m_hIcon;
 	CButton						m_cbOriginalImg;
-	CSplitButton				m_filterSplit;
-	UCHAR						m_filterSplitItem;
+	CSplitButton				m_blearFilterSplit;
+	UCHAR						m_blearFilterSplitItem;	//BlearFilterSplitFlag
+	CSplitButton				m_unsharpFilterSplit;
+	UCHAR						m_unsharpFilterSplitItem;	//UnsharpFilterSplitFlag
 
 	// 생성된 메시지 맵 함수
 	DECLARE_MESSAGE_MAP()
@@ -80,6 +88,9 @@ public:
 	afx_msg void OnBnClickedFilterSplit();
 	afx_msg void OnBnClickedGaussianFilterNormal();
 	afx_msg void OnBnClickedGaussianFilterLarge();
+	afx_msg void OnBnClickedUnsharpFilterSplit();
+	afx_msg void OnBnClickedUnsharpFilterNormal();
+	afx_msg void OnBnClickedUnsharpFilterLarge();
 	afx_msg void OnBnClickedInit();
 	afx_msg void OnBnClickedResize();
 	afx_msg void OnBnClickedSave();
