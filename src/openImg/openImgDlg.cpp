@@ -17,9 +17,12 @@
 #include "opencv2/imgproc/imgproc.hpp"	//cv::equalizeHist
 
 #include "IplImageDB.h"
+#include "TextManager.h"
 
 //Chiled Dlg
 #include "ResizeDlg.h"
+#include "TextFontDlg.h"
+#include "TextInputDlg.h"
 
 using namespace cv;
 #endif /*OPENCV*/
@@ -28,39 +31,16 @@ using namespace cv;
 #define new DEBUG_NEW
 #endif
 
-
-// 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// 대화 상자 데이터입니다.
-	enum { IDD = IDD_ABOUTBOX };
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
-
-// 구현입니다.
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-
 // CopenImgDlg 대화 상자
+
+CopenImgDlg* CopenImgDlg::m_instance = 0x00;
+
+CopenImgDlg* CopenImgDlg::Instance()
+{
+	if (CopenImgDlg::m_instance == NULL)
+		CopenImgDlg::m_instance = new CopenImgDlg();
+	return CopenImgDlg::m_instance;
+}
 
 CopenImgDlg::CopenImgDlg(CWnd* pParent /*=NULL*/) : CDialogEx(CopenImgDlg::IDD, pParent)
 {
@@ -115,6 +95,9 @@ BEGIN_MESSAGE_MAP(CopenImgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_UNSHARP_FILTER_SPLIT, &CopenImgDlg::OnBnClickedUnsharpFilterSplit)
 	ON_COMMAND(ID_UNSHARP_FILTER_NORMAL, &CopenImgDlg::OnBnClickedUnsharpFilterNormal)
 	ON_COMMAND(ID_UNSHARP_FILTER_LARGE, &CopenImgDlg::OnBnClickedUnsharpFilterLarge)
+	ON_BN_CLICKED(IDC_TEXT, &CopenImgDlg::OnBnClickedText)
+	ON_MESSAGE(MSG_TEXT_INPUT, &CopenImgDlg::OnCallBackTextInput)
+	ON_MESSAGE(MSG_MOVE_INPUT_TEXT_BOX, &CopenImgDlg::OnCallBackMoveTextInput)
 END_MESSAGE_MAP()
 
 
@@ -159,20 +142,16 @@ BOOL CopenImgDlg::OnInitDialog()
 
 	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_NORMAL;
 
+	this->m_textManager = NULL;
+	this->m_textFontDlg = NULL;
+	this->m_textInputDlg = NULL;
+
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
 void CopenImgDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }
 
 // 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
@@ -215,6 +194,7 @@ void CopenImgDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, 0);
+
 	CDialog::OnLButtonDown(nFlags, point);
 }
 
@@ -249,16 +229,20 @@ BOOL CopenImgDlg::PreTranslateMessage(MSG* pMsg)
 //}
 
 template <typename T>
-void CopenImgDlg::ShowImage(const T _name, int flag/* = OUTPUT_MESSAGE*/)
+void CopenImgDlg::ShowImage(const T _name, int flag /*= OUTPUT_MESSAGE*/)
 {
 	CIplImageDB* pIplImage = 0x00;
 	pIplImage = (CIplImageDB*)this->m_iplImage;
 
 	if (this->m_iplImage != NULL)
 	{
+		//Show Text
+		ShowText(flag);
+
 		switch (flag)
 		{
 		case 0:
+
 			if (pIplImage->m_resize != 0.0)
 			{
 				resize(pIplImage->m_outMat, pIplImage->m_resizeMat, Size(pIplImage->m_outMat.cols / pIplImage->m_resize, pIplImage->m_outMat.rows / pIplImage->m_resize), 0, 0, CV_INTER_NN);
@@ -277,7 +261,7 @@ void CopenImgDlg::ShowImage(const T _name, int flag/* = OUTPUT_MESSAGE*/)
 				imshow(_name, pIplImage->m_inMat);
 			break;
 		}
-		waitKey(10);
+		waitKey(100);
 	}
 }
 
@@ -285,6 +269,30 @@ template <typename K>
 void CopenImgDlg::DestroyImage(const K _name)
 {
 	destroyWindow(_name);
+}
+
+void CopenImgDlg::ShowText(int flag /*= OUTPUT_MESSAGE*/)
+{
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+
+	if (pIplImage != NULL)
+	{
+		if (pIplImage->m_textMat.data == NULL)
+			return;
+
+		UCHAR* data = pIplImage->m_textMat.data;
+		int length = pIplImage->m_outMat.rows * pIplImage->m_outMat.cols * pIplImage->m_outMat.channels();
+
+		for (int index = 0x00; index < length; index += pIplImage->m_outMat.channels())
+		{
+			if (data[index + 0] != 0x00 || data[index + 1] != 0x00 || data[index + 2] != 0x00)
+			{
+				pIplImage->m_outMat.data[index + 0] = data[index + 0];
+				pIplImage->m_outMat.data[index + 1] = data[index + 1];
+				pIplImage->m_outMat.data[index + 2] = data[index + 2];
+			}
+		}
+	}
 }
 
 void CopenImgDlg::ConvertImage(CIplImageDB* _pIplImage)
@@ -309,6 +317,46 @@ void CopenImgDlg::ConvertImage(CIplImageDB* _pIplImage)
 		merge(channels, mat);
 		cvtColor(mat, _pIplImage->m_outMat, CV_HSV2RGB);
 	}
+}
+
+static void OnMouseCallback(int event, int x, int y, int flags, void* userdata)
+{
+	if (event == EVENT_FLAG_LBUTTON)
+	{
+		if (CopenImgDlg::Instance()->m_textManager != NULL)
+		{
+			//Text Mode
+			if (CopenImgDlg::Instance()->m_textManager->GetTextMode() == TRUE)
+			{
+				//Add Dialog Box
+				POINT point;
+				RECT rect;
+				int ptX, ptY;
+
+				GetCursorPos(&point);
+
+				//CopenImgDlg::Instance()->GetTextDlg()->GetClientRect(&rect);
+
+				if (point.x - 200 > 0) ptX = point.x - 200;
+				else ptX = 0;
+
+				if (point.y - 160 > 0) ptY = point.y - 160;
+				else ptY = 0;
+
+				CopenImgDlg::Instance()->GetTextFontDlg()->ShowWindow(SW_SHOW);
+				CopenImgDlg::Instance()->GetTextFontDlg()->SetWindowPos(&CWnd::wndTopMost, ptX, ptY, 0, 0, SWP_NOSIZE);
+				CopenImgDlg::Instance()->m_textManager->SetTextInputBoxPoint(x, y);
+				CopenImgDlg::Instance()->m_textManager->SetTextMode(false);
+				CopenImgDlg::Instance()->m_textManager->SetBitmapWindowPoint(point.x - x, point.y - y);
+
+				CTextInputDlg* textInputDlg = new CTextInputDlg();
+				textInputDlg->Create(IDD_TEXT_INPUT, CopenImgDlg::Instance());
+				textInputDlg->ShowWindow(SW_SHOW);
+				textInputDlg->SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE);
+			}
+		}
+	}
+
 }
 
 //Drag & Drop
@@ -336,6 +384,13 @@ void CopenImgDlg::OnDropFiles(HDROP hDropInfo)
 			default:
 				break;
 			}
+		}
+
+		//Delete Text Manager
+		if (this->m_textManager != NULL)
+		{
+			this->m_textManager->DeleteALL();
+			SAFE_DELETE(this->m_textManager);
 		}
 
 		DestroyImage(pIplImage->m_name);
@@ -416,6 +471,10 @@ STATE CopenImgDlg::OpenImage(char* _filePath)
 		//	cvtColor(pIplImage->m_inMat, pIplImage->m_gray, CV_RGB2GRAY);
 		//}
 
+		namedWindow(pIplImage->m_name, 1);
+
+		setMouseCallback(pIplImage->m_name, OnMouseCallback, NULL);
+
 	}
 	else
 	{
@@ -425,7 +484,6 @@ STATE CopenImgDlg::OpenImage(char* _filePath)
 
 	return MOB_SUCCEED;
 }
-
 
 void CopenImgDlg::OnBnClickedEqualize()
 {
@@ -646,8 +704,12 @@ void CopenImgDlg::OnBnClickedUnsharpFilterNormal()
 		ShowImage(pIplImage->m_name);
 	}
 
-	this->m_unsharpFilterSplit.SetWindowTextW(L"선명하게");
-	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_NORMAL;
+	//Change Dialog Box(Split Button) Item
+	if (this->m_unsharpFilterSplitItem != FILTER_SPLIT_UNSHARP_NORMAL)
+	{
+		this->m_unsharpFilterSplit.SetWindowTextW(L"선명하게");
+		this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_NORMAL;
+	}
 }
 
 void CopenImgDlg::OnBnClickedUnsharpFilterLarge()
@@ -664,8 +726,13 @@ void CopenImgDlg::OnBnClickedUnsharpFilterLarge()
 		ConvertImage(pIplImage);
 		ShowImage(pIplImage->m_name);
 	}
-	this->m_unsharpFilterSplit.SetWindowTextW(L"더선명하게");
-	this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_LARGE;
+
+	//Change Dialog Box(Split Button) Item
+	if (this->m_unsharpFilterSplitItem != FILTER_SPLIT_UNSHARP_LARGE)
+	{
+		this->m_unsharpFilterSplit.SetWindowTextW(L"더선명하게");
+		this->m_unsharpFilterSplitItem = FILTER_SPLIT_UNSHARP_LARGE;
+	}
 }
 
 void CopenImgDlg::OnBnClickedResize()
@@ -706,6 +773,11 @@ void CopenImgDlg::OnBnClickedInit()
 		pIplImage->Clear();
 
 		pIplImage->SetResize(pIplImage->m_inMat.cols, pIplImage->m_inMat.rows);
+
+		pIplImage->m_textMat = NULL;
+
+		//Bitmap
+		this->m_textManager->Initialize();
 
 		ShowImage(pIplImage->m_name);
 	}
@@ -790,3 +862,58 @@ void CopenImgDlg::OnBnClickedClose()
 	::SendMessage(this->GetSafeHwnd(), WM_CLOSE, NULL, NULL);
 }
 
+
+
+void CopenImgDlg::OnBnClickedText()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+	if (pIplImage == NULL)
+		return;
+
+	if (this->m_textManager == NULL)
+	{
+		this->m_textManager = new CTextManager(pIplImage->m_inMat.cols, pIplImage->m_inMat.rows);
+
+		if (this->m_textFontDlg == NULL)
+		{
+			this->m_textFontDlg = CTextFontDlg::Instance();
+			this->m_textFontDlg->Create(IDD_TEXT_FONT, this);
+			this->m_textFontDlg->ShowWindow(SW_HIDE);
+		}
+	}
+
+	this->m_textManager->SetTextMode(true);
+}
+
+LRESULT CopenImgDlg::OnCallBackTextInput(WPARAM wParam, LPARAM lParam)
+{
+	CIplImageDB* pIplImage = (CIplImageDB*)this->m_iplImage;
+	
+	if (pIplImage != NULL)
+	{
+		Mat mat(CopenImgDlg::Instance()->m_textManager->GetSize().y, CopenImgDlg::Instance()->m_textManager->GetSize().x, CV_8UC3, CopenImgDlg::Instance()->m_textManager->GetBitmap());
+
+		pIplImage->m_textMat = mat.clone();
+
+		ShowImage(pIplImage->m_name);
+
+		this->m_textFontDlg->ShowWindow(SW_HIDE);
+	}
+	return TRUE;
+}
+
+LRESULT CopenImgDlg::OnCallBackMoveTextInput(WPARAM wParam, LPARAM lParam)
+{
+	this->m_textManager->MoveTextInputBoxPoint((int)wParam, (int)lParam);
+
+	//if (point.x - 200 > 0) ptX = point.x - 200;
+	//else ptX = 0;
+
+	//if (point.y - 160 > 0) ptY = point.y - 160;
+	//else ptY = 0;
+
+	//CopenImgDlg::Instance()->GetTextFontDlg()->ShowWindow(SW_SHOW);
+	//CopenImgDlg::Instance()->GetTextFontDlg()->SetWindowPos(&CWnd::wndTopMost, ptX, ptY, 0, 0, SWP_NOSIZE);
+	return TRUE;
+}

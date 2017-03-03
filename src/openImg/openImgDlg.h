@@ -29,35 +29,48 @@ enum UnsharpFilterSplitFlag
 	FILTER_SPLIT_UNSHARP_LARGE
 };
 
+class CTextFontDlg;
 class CIplImageDB;
+class CTextManager;
+class CTextInputDlg;
 
 // CopenImgDlg 대화 상자
 class CopenImgDlg : public CDialogEx
 {
 // 생성입니다.
-public:
+private:
 	CopenImgDlg(CWnd* pParent = NULL);	// 표준 생성자입니다.
+
+public:
 	~CopenImgDlg();
+
+	static CopenImgDlg* Instance();
 
 // 대화 상자 데이터입니다.
 	enum { IDD = IDD_OPENIMG_DIALOG };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
+
+	//static void OnMouseCallback(int event, int x, int y, int flags, void* userdata);
+private:
 
 protected:
 	template <typename T>
 	void ShowImage(const T _name, int flag = OUTPUT_MESSAGE);
 	template <typename K>
 	void DestroyImage(const K _name);
+	void ShowText(int flag = OUTPUT_MESSAGE);
 
 	STATE OpenImage(char* _filePath);
 	void ConvertImage(CIplImageDB* _pIplImage);
 
 
 // 구현입니다.
+private:
+	static CopenImgDlg*			m_instance;
 protected:
 	void*						m_iplImage;	//CIplImageDB for IplImageDB.h
 	HICON						m_hIcon;
@@ -66,6 +79,20 @@ protected:
 	UCHAR						m_blearFilterSplitItem;	//BlearFilterSplitFlag
 	CSplitButton				m_unsharpFilterSplit;
 	UCHAR						m_unsharpFilterSplitItem;	//UnsharpFilterSplitFlag
+
+	//Dialog
+	CTextFontDlg*				m_textFontDlg;
+	CTextInputDlg*				m_textInputDlg;
+
+public:
+	//Text
+	CTextManager*				m_textManager;
+
+public:
+	CTextFontDlg* GetTextFontDlg() { return this->m_textFontDlg; };
+	CTextInputDlg* GetTextInputDlg() { return this->m_textInputDlg; };
+
+public:
 
 	// 생성된 메시지 맵 함수
 	DECLARE_MESSAGE_MAP()
@@ -95,4 +122,8 @@ public:
 	afx_msg void OnBnClickedResize();
 	afx_msg void OnBnClickedSave();
 	afx_msg void OnBnClickedClose();
+	afx_msg void OnBnClickedText();
+
+	afx_msg LRESULT OnCallBackTextInput(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnCallBackMoveTextInput(WPARAM wParam, LPARAM lParam);
 };

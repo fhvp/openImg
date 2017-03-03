@@ -32,11 +32,14 @@ protected:
 public:
 	IplImage*			m_inImgIpl;
 	IplImage*			m_outImgIpl;
+
+	//Image Mat
 	Mat					m_inMat;
-	//Mat					m_gray;
-	//Mat					m_hsv;
 	Mat					m_midMat;	//Auto Control
 	Mat					m_outMat;
+
+	//Text Mat
+	Mat					m_textMat;
 
 	//file name & path
 	String				m_path;
