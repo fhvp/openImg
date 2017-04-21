@@ -40,7 +40,8 @@ void CIplImageDB::SetResize(int _width, int _height)
 	{
 		wResult = _width / DEFAULT_WIDTH;
 	}
-	else if (_height > DEFAULT_HIGHT)
+
+	if (_height > DEFAULT_HIGHT)
 	{
 		hResult = _height / DEFAULT_WIDTH;
 	}

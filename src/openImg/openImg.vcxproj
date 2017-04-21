@@ -119,6 +119,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitmapManager.h" />
+    <ClInclude Include="ImageViewDlg.h" />
     <ClInclude Include="IplImageDB.h" />
     <ClInclude Include="openImg.h" />
     <ClInclude Include="openImgDlg.h" />
@@ -131,6 +133,8 @@
     <ClInclude Include="TextManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BitmapManager.cpp" />
+    <ClCompile Include="ImageViewDlg.cpp" />
     <ClCompile Include="IplImageDB.cpp" />
     <ClCompile Include="openImg.cpp" />
     <ClCompile Include="openImgDlg.cpp" />

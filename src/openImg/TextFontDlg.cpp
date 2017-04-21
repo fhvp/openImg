@@ -50,6 +50,7 @@ BEGIN_MESSAGE_MAP(CTextFontDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_TEXT_ITLIC, &CTextFontDlg::OnBnClickedTextItlic)
 	ON_BN_CLICKED(IDC_TEXT_UNDERLINE, &CTextFontDlg::OnBnClickedTextUnderline)
 	ON_MESSAGE(MSG_CALL_INPUT_DLG, &CTextFontDlg::OnCallInputDlg)
+	ON_BN_CLICKED(IDC_TEXT_COLOR, &CTextFontDlg::OnBnClickedTextColor)
 END_MESSAGE_MAP()
 
 
@@ -120,9 +121,10 @@ BOOL CTextFontDlg::OnInitDialog()
 
 	this->m_bold = FW_NORMAL;
 	this->m_itlic = FALSE;
-	this->m_itlic = FALSE;
+	this->m_underline = FALSE;
 
 	//SetFont();
+	this->m_currentColor = RGB(0, 0, 0);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
@@ -250,14 +252,56 @@ void CTextFontDlg::SetFont()
 		DEFAULT_PITCH,									// 글꼴Pitch
 		this->m_beforFont								// 글꼴
 		);
+
+	//this->m_sampleText.SetFont(&font, TRUE);
 	
-	this->m_sampleText.SetFont(&font, TRUE);
-	this->m_sampleText.SetWindowTextW(DEFAULT_TEXT);
+	CHARFORMAT2 cFormat;
+
+	this->m_sampleText.GetDefaultCharFormat(cFormat);
+
+	cFormat.dwMask = CFM_ALL;// CFM_EFFECTS | CFM_COLOR | CFM_FACE | CFM_SIZE;
+	cFormat.crTextColor = this->m_currentColor;
+	cFormat.dwEffects = 0x00;
+	cFormat.cbSize = sizeof(CHARFORMAT2);
+
+	if (this->m_bold == FW_BOLD)
+	{
+		//cFormat.dwMask |= CFM_BOLD;
+		cFormat.dwEffects |= CFE_BOLD;
+	}
+	if (this->m_itlic)
+	{
+		//cFormat.dwMask |= CFM_ITALIC;
+		cFormat.dwEffects |= CFE_ITALIC;
+	}
+	if (this->m_underline)
+	{
+		//cFormat.dwMask |= CFM_UNDERLINE;
+		cFormat.dwEffects |= CFE_UNDERLINE;
+	}
+
+	cFormat.yHeight = _ttoi(this->m_beforSize) * 13;
+	cFormat.bCharSet = DEFAULT_CHARSET;
+
+	wcscpy_s(cFormat.szFaceName, this->m_beforFont.GetBuffer(0));
+
+	this->m_sampleText.SetFocus();
+	this->m_sampleText.SetSel(0, -1);
+	this->m_sampleText.SetDefaultCharFormat(cFormat);
+
+	this->m_sampleText.ReplaceSel(DEFAULT_TEXT);
+
+	//this->m_sampleText.SetWindowTextW(DEFAULT_TEXT);
 
 	if (this->m_hWndInputDlg != NULL)
-		::SendMessage(this->m_hWndInputDlg, MSG_SET_INPUT_FONT, 0, (LPARAM)&font);
+		::SendMessage(this->m_hWndInputDlg, MSG_SET_INPUT_FONT, (WPARAM)this->m_currentColor, (LPARAM)&cFormat/*font*/);
 
 	font.Detach();
+}
+
+void CTextFontDlg::DeleteAll()
+{
+
 }
 
 BOOL CTextFontDlg::PreTranslateMessage(MSG* pMsg)
@@ -338,7 +382,7 @@ void CTextFontDlg::OnBnClickedTextBold()
 	{
 		this->m_bold = FW_NORMAL;
 	}
-		
+	
 	SetFont();
 }
 
@@ -374,6 +418,22 @@ void CTextFontDlg::OnBnClickedTextUnderline()
 	}
 
 	SetFont();
+}
+
+void CTextFontDlg::OnBnClickedTextColor()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CColorDialog colorDialog(RGB(0, 0, 0), CC_RGBINIT);
+
+	//colorDialog.m_nFlags |= CC_FULLOPEN;
+	colorDialog.DoModal();
+
+	this->m_currentColor = colorDialog.GetColor();
+
+	SetFont();
+
+	//if (this->m_hWndInputDlg != NULL)
+	//	::PostMessage(this->m_hWndInputDlg, MSG_SET_INPUT_FONT, (WPARAM)this->m_currentColor, 0);
 }
 
 LRESULT CTextFontDlg::OnCallInputDlg(WPARAM wParam, LPARAM lParam)

@@ -21,7 +21,7 @@ private:
 	POINT								m_point;
 
 protected:
-	CEdit								m_editInputText;
+	CRichEditCtrl						m_editInputText;
 
 public:
 	CTextInputDlg(CWnd* pParent = NULL);   // 표준 생성자입니다.

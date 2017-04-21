@@ -23,6 +23,7 @@
 #include "ResizeDlg.h"
 #include "TextFontDlg.h"
 #include "TextInputDlg.h"
+#include "ImageViewDlg.h"
 
 using namespace cv;
 #endif /*OPENCV*/
@@ -146,6 +147,16 @@ BOOL CopenImgDlg::OnInitDialog()
 	this->m_textFontDlg = NULL;
 	this->m_textInputDlg = NULL;
 
+	//Create New Image View Dialog
+	//this->m_imageView = new CImageViewDlg();
+	//this->m_imageView->Create(IDD_IMAGE_VIEW, NULL);
+	//this->m_imageView->ShowWindow(SW_HIDE);
+
+	//Disable Text
+	//GetDlgItem(IDC_TEXT)->EnableWindow(FALSE);
+
+	this->m_imagehWnd = NULL;
+
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -247,18 +258,31 @@ void CopenImgDlg::ShowImage(const T _name, int flag /*= OUTPUT_MESSAGE*/)
 			{
 				resize(pIplImage->m_outMat, pIplImage->m_resizeMat, Size(pIplImage->m_outMat.cols / pIplImage->m_resize, pIplImage->m_outMat.rows / pIplImage->m_resize), 0, 0, CV_INTER_NN);
 				imshow(_name, pIplImage->m_resizeMat);
+				
+				//this->m_imageView->ShowImage(pIplImage->m_outMat.data, pIplImage->m_outMat.channels());
 			}
 			else
+			{
+				//test1
 				imshow(_name, pIplImage->m_outMat);
+
+//				this->m_imageView->ShowImage(pIplImage->m_outMat.data, pIplImage->m_outMat.channels());
+			}
 			break;
 		default:
 			if (pIplImage->m_resize != 0.0)
 			{
 				resize(pIplImage->m_inMat, pIplImage->m_resizeMat, Size(pIplImage->m_inMat.cols / pIplImage->m_resize, pIplImage->m_inMat.rows / pIplImage->m_resize), 0, 0, CV_INTER_NN);
 				imshow(_name, pIplImage->m_resizeMat);
+
+				//this->m_imageView->ShowImage(pIplImage->m_outMat.data, pIplImage->m_outMat.channels());
 			}
 			else
+			{
 				imshow(_name, pIplImage->m_inMat);
+
+				//this->m_imageView->ShowImage(pIplImage->m_outMat.data, pIplImage->m_outMat.channels());
+			}
 			break;
 		}
 		waitKey(100);
@@ -345,14 +369,20 @@ static void OnMouseCallback(int event, int x, int y, int flags, void* userdata)
 
 				CopenImgDlg::Instance()->GetTextFontDlg()->ShowWindow(SW_SHOW);
 				CopenImgDlg::Instance()->GetTextFontDlg()->SetWindowPos(&CWnd::wndTopMost, ptX, ptY, 0, 0, SWP_NOSIZE);
-				CopenImgDlg::Instance()->m_textManager->SetTextInputBoxPoint(x, y);
+				//CopenImgDlg::Instance()->m_textManager->SetTextInputBoxPoint(x, y);
 				CopenImgDlg::Instance()->m_textManager->SetTextMode(false);
 				CopenImgDlg::Instance()->m_textManager->SetBitmapWindowPoint(point.x - x, point.y - y);
 
+				//CTextInputDlg* textInputDlg = new CTextInputDlg();
+				//textInputDlg->Create(IDD_TEXT_INPUT, CopenImgDlg::Instance());
+				//textInputDlg->ShowWindow(SW_SHOW);
+				//textInputDlg->SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE);
+
+
 				CTextInputDlg* textInputDlg = new CTextInputDlg();
-				textInputDlg->Create(IDD_TEXT_INPUT, CopenImgDlg::Instance());
+				textInputDlg->Create(IDD_TEXT_INPUT, CWnd::FromHandle(CopenImgDlg::Instance()->GetImagehWnd()));
 				textInputDlg->ShowWindow(SW_SHOW);
-				textInputDlg->SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE);
+				textInputDlg->SetWindowPos(NULL, x, y, 0, 0, SWP_NOSIZE);
 			}
 		}
 	}
@@ -459,6 +489,12 @@ STATE CopenImgDlg::OpenImage(char* _filePath)
 		//Save Image DB
 		this->m_iplImage = pIplImage;
 
+		//Saved Image View Bitmap
+		//this->m_imageView->SetImgName(pIplImage->m_name.c_str());
+		//this->m_imageView->SetSize(pIplImage->m_inMat.cols, pIplImage->m_inMat.rows);
+		//this->m_imageView->MakeBitmap();
+		//this->m_imageView->ShowWindow(SW_SHOW);
+
 		ShowImage(pIplImage->m_name);
 		//if (pIplImage->m_inMat.channels() == 1)
 		//{
@@ -470,6 +506,14 @@ STATE CopenImgDlg::OpenImage(char* _filePath)
 		//	cvtColor(pIplImage->m_inMat, pIplImage->m_hsv, CV_RGB2HSV);
 		//	cvtColor(pIplImage->m_inMat, pIplImage->m_gray, CV_RGB2GRAY);
 		//}
+
+		//Set Name
+		if (this->m_imagehWnd != NULL)
+			DeleteObject(this->m_imagehWnd);
+
+		this->m_imagehWnd = (HWND)cvGetWindowHandle(pIplImage->m_name.c_str());
+
+		//HDC hDC = ::GetDC(this->m_imagehWnd);
 
 		namedWindow(pIplImage->m_name, 1);
 
@@ -777,7 +821,8 @@ void CopenImgDlg::OnBnClickedInit()
 		pIplImage->m_textMat = NULL;
 
 		//Bitmap
-		this->m_textManager->Initialize();
+		if (this->m_textManager != NULL)
+			this->m_textManager->Initialize();
 
 		ShowImage(pIplImage->m_name);
 	}
@@ -859,7 +904,27 @@ void CopenImgDlg::OnBnClickedClose()
 	}
 
 	//Close
-	::SendMessage(this->GetSafeHwnd(), WM_CLOSE, NULL, NULL);
+	destroyAllWindows();
+
+	if (this->m_iplImage != NULL)
+	{
+		this->m_iplImage->Delete();
+		SAFE_DELETE(this->m_iplImage);
+	}
+
+	if (this->m_textManager != NULL)
+	{
+		this->m_textManager->DeleteALL();
+		SAFE_DELETE(this->m_textManager);
+	}
+
+	if (this->m_textFontDlg != NULL)
+	{
+		this->m_textFontDlg->DeleteAll();
+		SAFE_DELETE(this->m_textFontDlg);
+	}
+
+	::PostMessage(this->GetSafeHwnd(), WM_CLOSE, NULL, NULL);
 }
 
 
@@ -916,4 +981,9 @@ LRESULT CopenImgDlg::OnCallBackMoveTextInput(WPARAM wParam, LPARAM lParam)
 	//CopenImgDlg::Instance()->GetTextFontDlg()->ShowWindow(SW_SHOW);
 	//CopenImgDlg::Instance()->GetTextFontDlg()->SetWindowPos(&CWnd::wndTopMost, ptX, ptY, 0, 0, SWP_NOSIZE);
 	return TRUE;
+}
+
+HWND CopenImgDlg::GetImagehWnd()
+{
+	return this->m_imagehWnd;
 }

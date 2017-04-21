@@ -42,14 +42,18 @@ protected:
 	//Dialog Box HWND
 	HWND						m_hWndInputDlg;
 
+	//Color
+	COLORREF					m_currentColor;
+
 public:
 	CComboBox					m_fontCombo;
 	CComboBox					m_sizeCombo;
-	CEdit						m_sampleText;
+	CRichEditCtrl				m_sampleText;
 
 
 public:
 	static BOOL CALLBACK CTextFontDlg::OnCallBackFontList(LPLOGFONTW lplf, LPTEXTMETRICW lptm, DWORD dwType, LPARAM lpData);
+	void DeleteAll();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
@@ -68,5 +72,6 @@ public:
 	afx_msg void OnBnClickedTextBold();
 	afx_msg void OnBnClickedTextItlic();
 	afx_msg void OnBnClickedTextUnderline();
+	afx_msg void OnBnClickedTextColor();
 	afx_msg LRESULT OnCallInputDlg(WPARAM wParam, LPARAM lParam);
 };

@@ -31,7 +31,7 @@ public:
 
 private:
 protected:
-	STATE MakeBitMap(int _x, int _y);
+	//STATE MakeBitMap(int _x, int _y);
 public:
 	CTextManager(int _x, int _y);
 	~CTextManager();
@@ -47,7 +47,7 @@ public:
 
 	void SetBitmapWindowPoint(int _bitmapX_0, int _bitmapY_0);
 
-	void SetTextInputBoxPoint(int _bitmapX, int _bitmapY);
+	//void SetTextInputBoxPoint(int _bitmapX, int _bitmapY);
 	void MoveTextInputBoxPoint(int _screenX, int _screenY);
 	POINT GetTextInputBoxPoint();
 

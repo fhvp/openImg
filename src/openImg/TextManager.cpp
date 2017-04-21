@@ -3,6 +3,8 @@
 #include "resource.h"
 #include "TextManager.h"
 #include "MOBPlatform.h"
+#include "BitmapManager.h"
+
 
 CTextManager::CTextManager(int _x, int _y)
 {
@@ -11,7 +13,8 @@ CTextManager::CTextManager(int _x, int _y)
 
 	this->m_state = CLASS_STATE_RUN;
 
-	if (MakeBitMap(_x, _y) == MOB_FAILED)
+	this->m_pBitmap = CBitmapManager::Instance()->MakeBitMap(this->m_hDC, &this->m_hBitmap, &this->m_bitmapInfo, _x, _y);
+	if (this->m_pBitmap == NULL)
 	{
 		//Error
 		this->m_state = CLASS_STATE_ERROR;
@@ -36,42 +39,12 @@ void CTextManager::Initialize()
 {
 	DeleteObject(this->m_hBitmap);
 	
-	if (MakeBitMap(this->m_size.x, this->m_size.y) == MOB_FAILED)
+	this->m_pBitmap = CBitmapManager::Instance()->MakeBitMap(this->m_hDC, &this->m_hBitmap, &this->m_bitmapInfo, this->m_size.x, this->m_size.y);
+	if (this->m_pBitmap == NULL)
 	{
 		//Error
 		this->m_state = CLASS_STATE_ERROR;
 	}
-}
-
-STATE CTextManager::MakeBitMap(int _x, int _y)
-{
-	if (this->m_state == CLASS_STATE_ERROR)
-		return MOB_FAILED;
-
-	memset(&this->m_bitmapInfo, 0x00, sizeof(BITMAPINFO));
-	this->m_bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	this->m_bitmapInfo.bmiHeader.biWidth = _x;
-	this->m_bitmapInfo.bmiHeader.biHeight = (-_y);		//flip 비트맵 뒤집어지는 효과
-	this->m_bitmapInfo.bmiHeader.biPlanes = 1;
-	this->m_bitmapInfo.bmiHeader.biBitCount = 24;
-	this->m_bitmapInfo.bmiHeader.biCompression = BI_RGB;
-	this->m_bitmapInfo.bmiHeader.biSizeImage = (((_x * 24 + 31) & ~31) >> 3) * _y;
-	this->m_bitmapInfo.bmiHeader.biXPelsPerMeter = 0;
-	this->m_bitmapInfo.bmiHeader.biYPelsPerMeter = 0;
-	this->m_bitmapInfo.bmiHeader.biClrImportant = 0;
-	this->m_bitmapInfo.bmiHeader.biClrUsed = 0;
-
-	this->m_hBitmap = ::CreateDIBSection(this->m_hDC, &this->m_bitmapInfo, DIB_RGB_COLORS, (void**)&this->m_pBitmap, NULL, 0);
-	
-	if (this->m_hBitmap == NULL)
-	{
-		AfxMessageBox(_T("Text를 만드는데 실패하였습니다."));
-		return MOB_FAILED;
-	}
-
-	SelectObject(this->m_hDC, this->m_hBitmap);
-
-	return MOB_SUCCEED;
 }
 
 HDC CTextManager::GetDC()
@@ -109,16 +82,16 @@ void CTextManager::SetBitmapWindowPoint(int _bitmapX_0, int _bitmapY_0)
 	this->m_bitmap0Point.y = _bitmapY_0;
 }
 
-void CTextManager::SetTextInputBoxPoint(int _bitmapX, int _bitmapY)
-{
-	this->m_originInputPoint.x = _bitmapX;
-	this->m_originInputPoint.y = _bitmapY;
-}
+//void CTextManager::SetTextInputBoxPoint(int _bitmapX, int _bitmapY)
+//{
+//	this->m_originInputPoint.x = _bitmapX;
+//	this->m_originInputPoint.y = _bitmapY;
+//}
 
 void CTextManager::MoveTextInputBoxPoint(int _screenX, int _screenY)
 {
-	this->m_originInputPoint.x = _screenX - this->m_bitmap0Point.x;
-	this->m_originInputPoint.y = _screenY - this->m_bitmap0Point.y;
+	this->m_originInputPoint.x = _screenX;// - this->m_bitmap0Point.x;
+	this->m_originInputPoint.y = _screenY;// - this->m_bitmap0Point.y;
 }
 
 POINT CTextManager::GetTextInputBoxPoint()
@@ -144,19 +117,15 @@ void CTextManager::CapturedDialog(CString _string, CFont* _font, int _x, int _y)
 		CDC* pDC = CDC::FromHandle(this->m_hDC);
 		CRect rect(this->m_originInputPoint.x + 4, this->m_originInputPoint.y + 5, this->m_originInputPoint.x + _x - 2, this->m_originInputPoint.y + _y - 2);
 
-		//CFont* oldFont = (CFont*)SelectObject(this->m_hDC, _font);
-		//COLORREF oldColor = SetTextColor(this->m_hDC, RGB(255, 0, 0));
-
 		CFont* oldFont = pDC->SelectObject(_font);
 
 		SetBkMode(this->m_hDC, TRANSPARENT);
-		pDC->SetTextColor(RGB(255, 0, 0));
+		COLORREF oldColor = pDC->SetTextColor(RGB(255, 0, 0));
 		DrawText(this->m_hDC, _string, -1, &rect, DT_LEFT);
 
-
 		//Reset Font
-		//SelectObject(this->m_hDC, oldFont);
-		//SetTextColor(this->m_hDC, oldColor);
+		SelectObject(this->m_hDC, oldFont);
+		SetTextColor(this->m_hDC, oldColor);
 	}
 }
 

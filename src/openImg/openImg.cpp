@@ -39,6 +39,7 @@ CopenImgApp theApp;
 
 BOOL CopenImgApp::InitInstance()
 {
+//TODO: call AfxInitRichEdit2() to initialize richedit2 library.
 	// 응용 프로그램 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
 	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다.
 	// InitCommonControlsEx()를 사용하지 않으면 창을 만들 수 없습니다.
@@ -53,6 +54,9 @@ BOOL CopenImgApp::InitInstance()
 
 
 	AfxEnableControlContainer();
+
+	// 필요한 값을 추가하세요
+	AfxInitRichEdit2();
 
 	// 대화 상자에 셸 트리 뷰 또는
 	// 셸 목록 뷰 컨트롤이 포함되어 있는 경우 셸 관리자를 만듭니다.

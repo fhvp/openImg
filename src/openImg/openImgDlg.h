@@ -33,6 +33,7 @@ class CTextFontDlg;
 class CIplImageDB;
 class CTextManager;
 class CTextInputDlg;
+class CImageViewDlg;
 
 // CopenImgDlg 대화 상자
 class CopenImgDlg : public CDialogEx
@@ -67,18 +68,26 @@ protected:
 	STATE OpenImage(char* _filePath);
 	void ConvertImage(CIplImageDB* _pIplImage);
 
+public:
+	HWND GetImagehWnd();
 
 // 구현입니다.
 private:
 	static CopenImgDlg*			m_instance;
 protected:
-	void*						m_iplImage;	//CIplImageDB for IplImageDB.h
+	CIplImageDB*				m_iplImage;	//CIplImageDB for IplImageDB.h
 	HICON						m_hIcon;
 	CButton						m_cbOriginalImg;
 	CSplitButton				m_blearFilterSplit;
 	UCHAR						m_blearFilterSplitItem;	//BlearFilterSplitFlag
 	CSplitButton				m_unsharpFilterSplit;
 	UCHAR						m_unsharpFilterSplitItem;	//UnsharpFilterSplitFlag
+
+	//Image View
+	//CImageViewDlg*				m_imageView;
+
+	//Image View HWND
+	HWND						m_imagehWnd;
 
 	//Dialog
 	CTextFontDlg*				m_textFontDlg;

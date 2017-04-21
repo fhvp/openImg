@@ -25,29 +25,30 @@ class CIplImageDB
 {
 private:
 protected:
-	int					m_contrast;		//밝기
-	double				m_brightness;	//명도
-	int					m_saturation;	//채도
-	bool				m_isChanged;
+	int							m_contrast;		//밝기
+	double						m_brightness;	//명도
+	int							m_saturation;	//채도
+	bool						m_isChanged;
 public:
-	IplImage*			m_inImgIpl;
-	IplImage*			m_outImgIpl;
+	IplImage*					m_inImgIpl;
+	IplImage*					m_outImgIpl;
 
 	//Image Mat
-	Mat					m_inMat;
-	Mat					m_midMat;	//Auto Control
-	Mat					m_outMat;
+	Mat							m_inMat;
+	Mat							m_midMat;	//Auto Control
+	Mat							m_outMat;
 
 	//Text Mat
-	Mat					m_textMat;
+	Mat							m_textMat;
 
 	//file name & path
-	String				m_path;
-	String				m_name;
+	String						m_path;
+	String						m_name;
 
 	//resize
-	double				m_resize;
-	Mat					m_resizeMat;
+	double						m_resize;
+	Mat							m_resizeMat;
+
 public:
 	CIplImageDB();
 	virtual ~CIplImageDB();

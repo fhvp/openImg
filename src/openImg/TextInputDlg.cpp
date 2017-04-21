@@ -42,26 +42,11 @@ END_MESSAGE_MAP()
 
 // CTextInputDlg 메시지 처리기입니다.
 
+typedef BOOL(WINAPI *SetLayer)(HWND hWnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 
 BOOL CTextInputDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
-	// TODO:  여기에 추가 초기화 작업을 추가합니다.
-	//LONG lResult = SetWindowLong(this->GetSafeHwnd(), GWL_EXSTYLE, GetWindowLong(this->GetSafeHwnd(), GWL_EXSTYLE) | WS_EX_LAYERED);
-
-	//if (!lResult)
-	//{
-	//	AfxMessageBox(L"텍스트 박스 만들기에 실패하였습니다.");
-	//	return FALSE;
-	//}
-
-	//double alpha = 255;
-
-	//SetLayeredWindowAttributes(RGB(255, 255, 255), alpha, LWA_COLORKEY | LWA_ALPHA);
-
-	//this->m_editInputText.GetDC()->SetBkMode(TRANSPARENT);
-	//this->m_editInputText.GetDC()->SelectStockObject(NULL_BRUSH);
 
 	//자신의 hWnd를 Font에게 알려주어 서로 통신 할 수 있도록 길을 엽니다.
 	if (this->m_hWnd != NULL)
@@ -96,6 +81,7 @@ BOOL CTextInputDlg::PreTranslateMessage(MSG* pMsg)
 
 				CopenImgDlg::Instance()->SendMessage(MSG_TEXT_INPUT, 0, 0);
 			}
+			pMsg->wParam = VK_ESCAPE;
 			//return TRUE;
 			break;
 		case VK_ESCAPE:
@@ -108,10 +94,27 @@ BOOL CTextInputDlg::PreTranslateMessage(MSG* pMsg)
 
 LRESULT CTextInputDlg::OnSetFont(WPARAM wParam, LPARAM lParam)
 {
-	if (lParam != NULL)
+	//if (lParam != NULL)
+	//{
+	//	this->m_editInputText.SetFont(((CFont*)lParam), 1);
+	//	this->m_editInputText.SetFocus();
+	//}
+	
+	if (wParam != NULL)
 	{
-		this->m_editInputText.SetFont(((CFont*)lParam), 1);
-		this->m_editInputText.SetFocus();
+		COLORREF currentColor;
+
+		currentColor = (COLORREF)wParam;
+
+		CHARFORMAT* cFormat = (CHARFORMAT*)lParam;
+
+		//this->m_editInputText.GetSelectionCharFormat(cFormat);
+
+		//cFormat.dwMask = CFM_COLOR;
+		//cFormat.dwEffects = NULL;
+		//cFormat.crTextColor = currentColor;
+
+		this->m_editInputText.SetSelectionCharFormat(*cFormat/*cFormat*/);
 	}
 
 	return TRUE;
@@ -121,7 +124,7 @@ void CTextInputDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, 0);
-
+	
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -130,14 +133,13 @@ void CTextInputDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
-	//CopenImgDlg::Instance()->PostMessage(MSG_MOVE_INPUT_TEXT_BOX, 0, (LPARAM)&point);
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
 
 
 void CTextInputDlg::OnMove(int x, int y)
 {
-	CopenImgDlg::Instance()->PostMessage(MSG_MOVE_INPUT_TEXT_BOX, (WPARAM)x, (LPARAM)y);
+	CopenImgDlg::Instance()->SendMessage(MSG_MOVE_INPUT_TEXT_BOX, (WPARAM)x, (LPARAM)y);
 	CDialogEx::OnMove(x, y);
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
